@@ -30,6 +30,8 @@
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
     "libphonenumber-js": "^1.11.11",
+    "lottie-ios": "^3.4.1",
+    "lottie-react-native": "^7.0.0",
     "native-base": "^3.4.28",
     "nativewind": "^4.0.1",
     "react": "18.2.0",

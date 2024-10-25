@@ -16,8 +16,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
 import { useRegisterViewModel } from "../view-models/register-view-model";
+import SucessComponent from "./sucess-animation";
 
-// Schema de validação com yup
+
 const schema = yup.object().shape({
   full_name: yup.string().required("Nome é obrigatório"),
   phone_number: yup
@@ -42,6 +43,8 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   const [provinces, setProvinces] = useState<Array<{ label: string; value: string }>>([]);
   const [municipalities, setMunicipalities] = useState<Array<{ label: string; value: string }>>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isSuccess2, setIsSuccess2] = useState(false);
 
   const {
     control,
@@ -51,11 +54,8 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
     resolver: yupResolver(schema),
   });
 
-  // Usar o hook useRegisterViewModel
-  const { register, fullName, setFullName, phoneNumber, setPhoneNumber, password, setPassword, municipe_id, setMunicipeId, loading, error } = useRegisterViewModel();
+  const { register, fullName, setFullName, phoneNumber, setPhoneNumber, password, setPassword, municipe_id, setMunicipeId, loading, error, isSuccess, setIsSuccess } = useRegisterViewModel();
 
-
-  // Carrega as províncias ao abrir o modal de registro
   useEffect(() => {
     if (visible) {
       loadProvinces();
@@ -87,21 +87,52 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
 
   const handleProvinceChange = (provinceId: string) => {
     setSelectedProvince(provinceId);
-    loadMunicipalities(Number(provinceId)); // Carrega os municípios ao selecionar uma província
+    loadMunicipalities(Number(provinceId));
   };
+
 
 
   const handleRegister = async (data: any) => {
-    setFullName(data.full_name);
-    setPhoneNumber(data.phone_number);
-    setMunicipeId(Number(data.municipe_id));
-    setPassword(data.password);
-
-    console.log(data)
-
-    await register(data.full_name, data.phone_number, data.password, data.municipe_id);
-    onDismiss();
+    try {
+      setFullName(data.full_name);
+      setPhoneNumber(data.phone_number);
+      setMunicipeId(Number(data.municipe_id));
+      setPassword(data.password);
+  
+      
+      await register(data.full_name, data.phone_number, data.password, data.municipe_id);
+      
+      console.log(isSuccess)
+      // Verifica se o usuário foi criado com sucesso e atualiza o estado
+      if (!isSuccess) {
+        setModalVisible(true); // Abre o modal de sucesso
+        setTimeout(() => {
+          setModalVisible(false); // Fecha o modal automaticamente após 3 segundos
+          setIsSuccess(false); // Reseta o estado de sucesso após fechamento
+          onDismiss(); 
+        }, 1000);
+      }
+  
+      setFullName('');
+      setPhoneNumber('');
+      setPassword('');
+      setMunicipeId(0);
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error);
+    }
   };
+  
+
+  if (isSuccess) {
+    return (
+      <View style={styles.successContainer}>
+        <SucessComponent
+          view={modalVisible}
+          onClose={() => setModalVisible(false)}
+        />
+      </View>
+    );
+  }
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
@@ -114,7 +145,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
             {isLogin ? (
               <>
                 <Text style={styles.title}>Login</Text>
-                {/* Login: Não vamos adicionar validação ao login agora */}
                 <TextInput
                   placeholder="Telefone"
                   style={styles.input}
@@ -140,7 +170,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
               <>
                 <Text style={styles.title}>Registro de Usuário</Text>
 
-                {/* Nome */}
                 <Controller
                   control={control}
                   name="full_name"
@@ -161,10 +190,9 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                   )}
                 />
 
-                {/* Telefone */}
                 <Controller
                   control={control}
-                  name="phone_number" // Corrigido o nome do campo
+                  name="phone_number"
                   render={({ field: { onChange, value } }) => (
                     <>
                       <TextInput
@@ -184,7 +212,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                   )}
                 />
 
-                {/* Província */}
                 <Controller
                   control={control}
                   name="province_id"
@@ -193,7 +220,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                       <RNPickerSelect
                         onValueChange={(value) => {
                           onChange(value);
-                          handleProvinceChange(value); // Atualiza a seleção de província
+                          handleProvinceChange(value);
                         }}
                         items={provinces}
                         value={value}
@@ -209,7 +236,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                   )}
                 />
 
-                {/* Município */}
                 <Controller
                   control={control}
                   name="municipe_id"
@@ -231,7 +257,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                   )}
                 />
 
-                {/* Senha */}
                 <Controller
                   control={control}
                   name="password"
@@ -260,7 +285,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                     style={styles.switchButton}
                     onPress={() => setIsLogin(true)}
                   >
-                    Faça Login
+                    Faça login
                   </Text>
                 </Text>
               </>
@@ -275,16 +300,16 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
   },
   modalContainer: {
+    width: "90%",
     backgroundColor: "#fff",
+    borderRadius: 8,
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    width: "100%",
-    maxHeight: "80%",
+    elevation: 10,
   },
   title: {
     fontSize: 24,
@@ -292,23 +317,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    borderWidth: 1,
+    height: 40,
     borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
+    borderWidth: 1,
+    borderRadius: 4,
     marginBottom: 10,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-  },
-  switchText: {
-    marginTop: 10,
-    textAlign: "center",
-  },
-  switchButton: {
-    color: "blue",
-    textDecorationLine: "underline",
+    paddingHorizontal: 10,
   },
   closeButton: {
     position: "absolute",
@@ -316,38 +330,55 @@ const styles = StyleSheet.create({
     right: 10,
   },
   closeButtonText: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 18,
     color: "#000",
   },
-  content: {
-    flexGrow: 1,
+  errorText: {
+    color: "red",
+    fontSize: 12,
+  },
+  switchText: {
+    marginTop: 15,
+    textAlign: "center",
+  },
+  switchButton: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
+  successContainer: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  content: {
+    paddingVertical: 20,
   },
 });
 
-// Estilos personalizados para o RNPickerSelect
-const pickerSelectStyles = StyleSheet.create({
+
+const pickerSelectStyles = {
   inputIOS: {
     fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    color: "black",
-    marginBottom: 10,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30,
   },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    color: "black",
-    marginBottom: 10,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30,
   },
-});
+
+};
 
 export default LoginRegisterModal;
