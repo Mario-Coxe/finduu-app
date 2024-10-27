@@ -17,29 +17,19 @@ export function useRegisterViewModel() {
     phoneNumber: string,
     password: string,
     municipe_id: number
-  ) => {
-    setLoading(true); // Ativar o estado de loading
+  ): Promise<boolean> => {
+    setLoading(true);
     try {
-      // Criar o novo objeto do usuário
       const newUser = new User(fullName, phoneNumber, password, municipe_id);
-      const result = await AuthService.register(newUser);
-      console.log("Usuário registrado com sucesso:", result);
-
-      // Limpar os estados dos campos
-      setFullName("");
-      setPhoneNumber("");
-      setPassword("");
-      setMunicipeId(0);
-
-      setIsSuccess(true); // Ativar o estado de sucesso
+      await AuthService.register(newUser);
+      setIsSuccess(true);
+      return true; // Sucesso
     } catch (err: any) {
       setError(err.message || "Erro ao registrar usuário.");
+      setIsSuccess(false);
+      return false; // Falha
     } finally {
-      setFullName("");
-      setPhoneNumber("");
-      setPassword("");
-      setMunicipeId(0);
-      setLoading(false); // Desativar o estado de loading
+      setLoading(false);
     }
   };
 
@@ -53,7 +43,7 @@ export function useRegisterViewModel() {
     municipe_id,
     setMunicipeId,
     loading,
-    isSuccess, // Novo estado de sucesso
+    isSuccess,
     error,
     setIsSuccess,
     register,

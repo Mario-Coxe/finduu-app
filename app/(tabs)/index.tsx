@@ -67,9 +67,9 @@ export default function HomeScreen() {
 
   const handleFollowCase = (caseId: number) => {
     setIsFollowing((prev) => !prev); 
-    console.log("Antes de abrir o modal:", modalVisible);
+    //console.log("Antes de abrir o modal:", modalVisible);
     setModalVisible(true);
-    console.log(`Caso ${caseId} ${isFollowing ? "desseguido" : "seguido"}`);
+    //console.log(`Caso ${caseId} ${isFollowing ? "desseguido" : "seguido"}`);
   };
 
   if (loading && !refreshing) {

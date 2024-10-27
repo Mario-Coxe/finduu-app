@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, StyleSheet, Modal, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
-import loadingAnimation from '../../../assets/icons/sucess.json';
+import loadingAnimation from '../../../assets/icons/error.json';
 
-interface SucessComponentProps {
+interface ErrorComponentProps {
   view: boolean;
   onClose: () => void;
   message: string | null
 }
 
-const SucessComponent: React.FC<SucessComponentProps> = ({ view, onClose, message }) => {
+const ErrorComponent: React.FC<ErrorComponentProps> = ({ view, onClose, message }) => {
 
   return (
     <Modal
@@ -60,4 +60,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SucessComponent;
+export default ErrorComponent;

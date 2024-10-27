@@ -17,7 +17,7 @@ import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
 import { useRegisterViewModel } from "../view-models/register-view-model";
 import SucessComponent from "./sucess-animation";
-
+import ErrorComponent from "./error-animation";
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Nome é obrigatório"),
@@ -45,11 +45,13 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [modalVisible, setModalVisible] = useState(false);
   const [isSuccess2, setIsSuccess2] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -91,43 +93,43 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   };
 
 
-
   const handleRegister = async (data: any) => {
     try {
       setFullName(data.full_name);
       setPhoneNumber(data.phone_number);
       setMunicipeId(Number(data.municipe_id));
       setPassword(data.password);
-  
-      
-      await register(data.full_name, data.phone_number, data.password, data.municipe_id);
-      
-      console.log(isSuccess)
-      // Verifica se o usuário foi criado com sucesso e atualiza o estado
-      if (!isSuccess) {
-        setModalVisible(true); // Abre o modal de sucesso
+
+      const wasSuccessful = await register(data.full_name, data.phone_number, data.password, data.municipe_id);
+
+      if (wasSuccessful) {
+        setModalVisible(true);
         setTimeout(() => {
-          setModalVisible(false); // Fecha o modal automaticamente após 3 segundos
-          setIsSuccess(false); // Reseta o estado de sucesso após fechamento
-          onDismiss(); 
+          setModalVisible(false);
+          setIsSuccess(false);
+          onDismiss();
+          reset();
         }, 1000);
+      } else {
+        console.log("error", error);
+        setErrorModalVisible(true);
+        setTimeout(() => {
+          setErrorModalVisible(false);
+        }, 2000);
       }
-  
-      setFullName('');
-      setPhoneNumber('');
-      setPassword('');
-      setMunicipeId(0);
     } catch (error) {
       console.error("Erro ao criar usuário:", error);
+      setErrorModalVisible(true); // Exibe o modal de erro em caso de exceção
     }
   };
-  
+
 
   if (isSuccess) {
     return (
       <View style={styles.successContainer}>
         <SucessComponent
           view={modalVisible}
+          message="Sucesso!"
           onClose={() => setModalVisible(false)}
         />
       </View>
@@ -293,6 +295,29 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
           </ScrollView>
         </View>
       </View>
+
+
+      {/* Modal de sucesso */}
+      {isSuccess && (
+        <View style={styles.successContainer}>
+          <SucessComponent
+            view={modalVisible}
+            message="Sucesso!"
+            onClose={() => setModalVisible(false)}
+          />
+        </View>
+      )}
+
+      {/* Modal de erro */}
+      {errorModalVisible && (
+        <View style={styles.successContainer}>
+          <ErrorComponent
+            view={errorModalVisible}
+            message={error}
+            onClose={() => setErrorModalVisible(false)}
+          />
+        </View>
+      )}
     </Modal>
   );
 };
