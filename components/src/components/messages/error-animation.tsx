@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Modal, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
-import loadingAnimation from '../../../assets/icons/error.json';
+import loadingAnimation from '../../../../assets/icons/error.json';
 
 interface ErrorComponentProps {
   view: boolean;

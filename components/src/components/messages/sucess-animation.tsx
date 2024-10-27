@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Modal, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
-import loadingAnimation from '../../../assets/icons/sucess.json';
+import loadingAnimation from '../../../../assets/icons/sucess.json';
 
 interface SucessComponentProps {
   view: boolean;

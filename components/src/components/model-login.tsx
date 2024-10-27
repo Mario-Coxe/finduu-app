@@ -6,18 +6,22 @@ import {
   Button,
   StyleSheet,
   Modal,
-  TouchableOpacity,
   ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useFonts } from "expo-font";
 import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
-import { useRegisterViewModel } from "../view-models/register-view-model";
-import SucessComponent from "./sucess-animation";
-import ErrorComponent from "./error-animation";
+import { useRegisterViewModel } from "../view-models/register-and-login-view-model";
+import SucessComponent from "./messages/sucess-animation";
+import ErrorComponent from "./messages/error-animation";
+
 
 const schema = yup.object().shape({
   full_name: yup.string().required("Nome é obrigatório"),
@@ -39,6 +43,14 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   visible,
   onDismiss,
 }) => {
+
+  const [loaded] = useFonts({
+    SpaceMono: require("../../../assets/fonts/SpaceMono-Regular.ttf"),
+    PoppinsBold: require("../../../assets/fonts/Poppins-Bold.ttf"),
+    PoppinsRegular: require("../../../assets/fonts/Poppins-Regular.ttf"),
+  });
+
+
   const [isLogin, setIsLogin] = useState(true);
   const [provinces, setProvinces] = useState<Array<{ label: string; value: string }>>([]);
   const [municipalities, setMunicipalities] = useState<Array<{ label: string; value: string }>>([]);
@@ -63,6 +75,10 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
       loadProvinces();
     }
   }, [visible]);
+
+  if (!loaded) {
+    return null;
+  }
 
   const loadProvinces = async () => {
     try {
@@ -119,10 +135,12 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
       }
     } catch (error) {
       console.error("Erro ao criar usuário:", error);
-      setErrorModalVisible(true); // Exibe o modal de erro em caso de exceção
+      setTimeout(() => {
+        setErrorModalVisible(false);
+      }, 1000);
+      setErrorModalVisible(true);
     }
   };
-
 
   if (isSuccess) {
     return (
@@ -157,7 +175,9 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                   style={styles.input}
                   secureTextEntry={true}
                 />
-                <Button title="Login" onPress={onDismiss} />
+                <TouchableOpacity style={styles.loginButton} onPress={onDismiss}>
+                  <Text style={styles.loginButtonText}>Login</Text>
+                </TouchableOpacity>
                 <Text style={styles.switchText}>
                   Não tem conta?{" "}
                   <Text
@@ -279,8 +299,9 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                     </>
                   )}
                 />
-
-                <Button title="Registrar" onPress={handleSubmit(handleRegister)} />
+                <TouchableOpacity style={styles.loginButton} onPress={handleSubmit(handleRegister)}>
+                  <Text style={styles.loginButtonText}>Registrar</Text>
+                </TouchableOpacity>
                 <Text style={styles.switchText}>
                   Já tem uma conta?{" "}
                   <Text
@@ -325,9 +346,9 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    justifyContent: "flex-end",
   },
   modalContainer: {
     width: "90%",
@@ -335,19 +356,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     elevation: 10,
+    //height: 350,
+    marginBottom: 10
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 20,
+    fontFamily: "PoppinsBold",
   },
   input: {
-    height: 40,
-    borderColor: "#ccc",
+    height: 48,
+    borderColor: "#E0E0E0",
     borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderRadius: 12,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#F9F9F9",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 1,
+    fontSize: 12,
+    fontFamily: "PoppinsRegular",
   },
   closeButton: {
     position: "absolute",
@@ -356,7 +387,8 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
-    color: "#000",
+    color: "#FF3B30",
+    fontFamily: "PoppinsBold",
   },
   errorText: {
     color: "red",
@@ -365,6 +397,8 @@ const styles = StyleSheet.create({
   switchText: {
     marginTop: 15,
     textAlign: "center",
+    fontFamily: "PoppinsRegular",
+    color: "#000"
   },
   switchButton: {
     color: "blue",
@@ -378,6 +412,25 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingVertical: 20,
+  },
+  loginButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: "#007AFF", // Azul clássico do iOS
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2, // Sombras no Android
+  },
+  loginButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: "PoppinsBold",
+
   },
 });
 
