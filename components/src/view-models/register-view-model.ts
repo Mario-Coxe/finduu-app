@@ -3,13 +3,12 @@ import User from "../models/users";
 import { AuthService } from "../services/auth-service";
 
 export function useRegisterViewModel() {
-  // Definindo os estados para os inputs de registro
   const [fullName, setFullName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [municipe_id, setMunicipeId] = useState<number>(0); // Id do município
-  const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
-  const [isSuccess, setIsSuccess] = useState<boolean>(false); // Estado de sucesso
+  const [municipe_id, setMunicipeId] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const register = async (

@@ -3,8 +3,20 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import { View, Text } from "react-native";
+import { useFonts } from "expo-font";
 
 export default function Layout() {
+
+  const [loaded] = useFonts({
+    SpaceMono: require("../../assets/fonts/SpaceMono-Regular.ttf"),
+    PoppinsBold: require("../../assets/fonts/Poppins-Bold.ttf"),
+    PoppinsRegular: require("../../assets/fonts/Poppins-Regular.ttf"),
+  });
+
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -27,7 +39,12 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: "Página Inicial",
+          headerTitle: "VOLTAA",
+          headerTitleStyle: {
+            fontFamily: 'PoppinsBold', 
+            fontSize: 20,
+            color: "#F02A4B", 
+          },
           tabBarIcon: ({ focused }) => (
             <View
               style={{
@@ -45,8 +62,9 @@ export default function Layout() {
                   color: focused ? "#F02A4B" : "gray",
                   fontSize: 12,
                   marginTop: 4,
+                  fontFamily: 'PoppinsRegular',
                 }}
-        
+
               >
                 Home
               </Text>
@@ -77,6 +95,7 @@ export default function Layout() {
                   color: focused ? "#F02A4B" : "gray",
                   fontSize: 12,
                   marginTop: 4,
+                  fontFamily: 'PoppinsRegular',
                 }}
               >
                 Pesquisar
@@ -130,6 +149,7 @@ export default function Layout() {
                   color: focused ? "#F02A4B" : "gray",
                   fontSize: 12,
                   marginTop: 4,
+                  fontFamily: 'PoppinsRegular',
                 }}
               >
                 Seguidos
@@ -160,6 +180,7 @@ export default function Layout() {
                   color: focused ? "#F02A4B" : "gray",
                   fontSize: 12,
                   marginTop: 4,
+                  fontFamily: 'PoppinsRegular',
                 }}
               >
                 Perfil
