@@ -19,7 +19,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { formatDate } from "@/components/src/utils/date-formatter";
 import { getStatusColor } from "@/components/src/utils/color-for-status";
-import LoginRegisterModal from "@/components/src/components/model-login";
+import LoginRegisterModal from "@/components/src/components/model-login-and-register";
 
 const { width: screenWidth } = Dimensions.get("window");
 

@@ -19,12 +19,31 @@ import { useFonts } from "expo-font";
 import Icon from "@expo/vector-icons/Ionicons";
 import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
-import { useRegisterViewModel } from "../view-models/register-and-login-view-model";
+import { useAuthViewModel } from "../view-models/register-and-login-view-model";
 import SucessComponent from "./messages/sucess-animation";
 import ErrorComponent from "./messages/error-animation";
 
 
 const schema = yup.object().shape({
+  full_name: yup.string().required("Nome é obrigatório"),
+  phone_number: yup
+    .string()
+    .required("Telefone é obrigatório")
+    .matches(/^9\d{8}$/, "Número de telefone inválido. Deve começar com 9 e ter 9 dígitos."),
+  province_id: yup.string().required("Província é obrigatória"),
+  municipe_id: yup.string().required("Município é obrigatório"),
+  password: yup.string().required("Senha é obrigatória").min(6, "A senha deve ter no mínimo 6 caracteres"),
+});
+
+const loginSchema = yup.object().shape({
+  phone_number: yup
+    .string()
+    .required("Telefone é obrigatório")
+    .matches(/^9\d{8}$/, "Número de telefone inválido. Deve começar com 9 e ter 9 dígitos."),
+  password: yup.string().required("Senha é obrigatória"),
+});
+
+const registerSchema = yup.object().shape({
   full_name: yup.string().required("Nome é obrigatório"),
   phone_number: yup
     .string()
@@ -57,7 +76,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   const [municipalities, setMunicipalities] = useState<Array<{ label: string; value: string }>>([]);
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [isSuccess2, setIsSuccess2] = useState(false);
+  const [loggedIn, setloggedIn] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
 
   const {
@@ -66,10 +85,10 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
     formState: { errors },
     reset
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(isLogin ? loginSchema : registerSchema),
   });
 
-  const { register, fullName, setFullName, phoneNumber, setPhoneNumber, password, setPassword, municipe_id, setMunicipeId, loading, error, isSuccess, setIsSuccess } = useRegisterViewModel();
+  const { register, fullName, setFullName, phoneNumber, setPhoneNumber, password, setPassword, municipe_id, setMunicipeId, loading, error, isSuccess, setIsSuccess, login } = useAuthViewModel();
 
   useEffect(() => {
     if (visible) {
@@ -109,6 +128,37 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
     loadMunicipalities(Number(provinceId));
   };
 
+  const handleLogin = async (data: any) => {
+    try {
+
+      const loginSuccessful = await login(data.phone_number, data.password);
+      if (loginSuccessful) {
+        setloggedIn(true)
+        setModalVisible(true);
+        setTimeout(() => {
+          setModalVisible(false);
+          setIsSuccess(false);
+          setloggedIn(false)
+          onDismiss();
+          reset();
+        }, 1000);
+      } else {
+        setErrorModalVisible(true);
+        setModalVisible(false);
+        setTimeout(() => {
+          setErrorModalVisible(false);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Erro ao efetuar login:", error);
+
+
+      setErrorModalVisible(true);
+      setTimeout(() => {
+        setErrorModalVisible(false);
+      }, 1000);
+    }
+  };
 
   const handleRegister = async (data: any) => {
     try {
@@ -146,19 +196,23 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
     }
   };
 
+
+
+
+
   if (isSuccess) {
     return (
       <View style={styles.successContainer}>
         <SucessComponent
           view={modalVisible}
-          message="Sucesso!"
+          message={loggedIn ? "Logado com Sucesso" : "Sucesso!"}
           onClose={() => setModalVisible(false)}
         />
       </View>
     );
   }
 
-  if(errorModalVisible){
+  if (errorModalVisible) {
     return (
       <View style={styles.successContainer}>
         <ErrorComponent
@@ -181,19 +235,41 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
             {isLogin ? (
               <>
                 <Text style={styles.title}>Login</Text>
-                <TextInput
-                  placeholder="Telefone"
-                  style={styles.input}
-                  keyboardType="numeric"
+                <Controller
+                  control={control}
+                  name="phone_number"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInput
+                      placeholder="Telefone"
+                      style={styles.input}
+                      keyboardType="numeric"
+                      onChangeText={onChange}
+                      value={value}
+                      maxLength={9}
+                    />
+                  )}
                 />
-                <TextInput
-                  placeholder="Senha"
-                  style={styles.input}
-                  secureTextEntry={true}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInput
+                      placeholder="Senha"
+                      style={styles.input}
+                      secureTextEntry={true}
+                      onChangeText={onChange}
+                      value={value}
+                    />
+                  )}
                 />
-                <TouchableOpacity style={styles.loginButton} onPress={onDismiss}>
+                <TouchableOpacity
+                  style={styles.loginButton}
+
+                  onPress={handleSubmit(handleLogin)}
+                >
                   <Text style={styles.loginButtonText}>Login</Text>
                 </TouchableOpacity>
+
                 <Text style={styles.switchText}>
                   Não tem conta?{" "}
                   <Text
@@ -339,7 +415,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
         <View style={styles.successContainer}>
           <SucessComponent
             view={modalVisible}
-            message="Sucesso!"
+            message={loggedIn ? "Logado com Sucesso" : "Sucesso!"}
             onClose={() => setModalVisible(false)}
           />
         </View>
@@ -412,7 +488,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 12,
     fontFamily: "SpaceMono",
-    backgroundColor: 'rgba(255, 235, 238, 0.2)', 
+    backgroundColor: 'rgba(255, 235, 238, 0.2)',
     shadowOpacity: 0.3,
     shadowRadius: 1,
     shadowOffset: {
