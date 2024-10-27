@@ -130,8 +130,11 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
       } else {
         console.log("error", error);
         setErrorModalVisible(true);
+        setModalVisible(false);
+        setIsSuccess(false);
         setTimeout(() => {
           setErrorModalVisible(false);
+          setModalVisible(true)
         }, 2000);
       }
     } catch (error) {
@@ -150,6 +153,18 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
           view={modalVisible}
           message="Sucesso!"
           onClose={() => setModalVisible(false)}
+        />
+      </View>
+    );
+  }
+
+  if(errorModalVisible){
+    return (
+      <View style={styles.successContainer}>
+        <ErrorComponent
+          view={errorModalVisible}
+          message={error}
+          onClose={() => setErrorModalVisible(false)}
         />
       </View>
     );
@@ -392,12 +407,12 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsBold",
   },
   errorText: {
-    color: "#D50000", 
+    color: "#D50000",
     marginTop: -10,
     padding: 10,
     fontSize: 12,
-    fontFamily: "SpaceMono", 
-    backgroundColor: 'rgba(255, 235, 238, 0.2)', // Fundo sutil
+    fontFamily: "SpaceMono",
+    backgroundColor: 'rgba(255, 235, 238, 0.2)', 
     shadowOpacity: 0.3,
     shadowRadius: 1,
     shadowOffset: {
