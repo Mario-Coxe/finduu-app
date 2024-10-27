@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Modal, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
+import { useFonts } from "expo-font";
 import loadingAnimation from '../../../../assets/icons/sucess.json';
 
 interface SucessComponentProps {
@@ -10,6 +11,17 @@ interface SucessComponentProps {
 }
 
 const SucessComponent: React.FC<SucessComponentProps> = ({ view, onClose, message }) => {
+  const [loaded] = useFonts({
+    SpaceMono: require("../../../../assets/fonts/SpaceMono-Regular.ttf"),
+    PoppinsBold: require("../../../../assets/fonts/Poppins-Bold.ttf"),
+    PoppinsRegular: require("../../../../assets/fonts/Poppins-Regular.ttf"),
+    RobotoCondensedExtraBold: require("../../../../assets/fonts/RobotoCondensed-ExtraBold.ttf"),
+
+  });
+
+  if (!loaded) {
+    return null;
+  }
 
   return (
     <Modal
@@ -55,8 +67,10 @@ const styles = StyleSheet.create({
   },
   message: {
     marginVertical: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: "RobotoCondensedExtraBold",
+    fontSize: 20,
+    textAlign: 'center',
+    color: '#000',
   },
 });
 
