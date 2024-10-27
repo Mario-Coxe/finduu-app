@@ -2,8 +2,11 @@ import { useState } from "react";
 import User from "../models/users";
 import { LOGIN } from "../models/interfaces/login-interface";
 import { AuthService } from "../services/auth-service";
+import { useAuth } from "../context/auth-context";
 
 export function useAuthViewModel() {
+  const { login: authenticateUser } = useAuth(); // Renomeando a função de login do contexto
+  
   const [fullName, setFullName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -34,15 +37,16 @@ export function useAuthViewModel() {
     }
   };
 
-  // Função de login
-  const login = async (
+  const loginUser = async (
     phoneNumber: number,
     password: string
   ): Promise<boolean> => {
     setLoading(true);
     try {
-      const login = new LOGIN(password, phoneNumber);
-      await AuthService.login(login);
+      const loginData = new LOGIN(password, phoneNumber);
+      const userResponse = await AuthService.login(loginData);
+      // Supondo que `userResponse` contém os dados do usuário
+      authenticateUser(userResponse); // Armazenando os dados do usuário no contexto
       setIsAuthenticated(true);
       setIsSuccess(true);
       return true; // Sucesso no login
@@ -71,9 +75,8 @@ export function useAuthViewModel() {
     setIsSuccess,
     isAuthenticated,
     setIsAuthenticated,
-
   
     register,
-    login,
+    login: loginUser, // Usando a função renomeada aqui
   };
 }

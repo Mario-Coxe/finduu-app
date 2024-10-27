@@ -3,37 +3,22 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Modal,
   ScrollView,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useFonts } from "expo-font";
-import Icon from "@expo/vector-icons/Ionicons";
 import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
 import { useAuthViewModel } from "../view-models/register-and-login-view-model";
 import SucessComponent from "./messages/sucess-animation";
 import ErrorComponent from "./messages/error-animation";
 
-
-const schema = yup.object().shape({
-  full_name: yup.string().required("Nome é obrigatório"),
-  phone_number: yup
-    .string()
-    .required("Telefone é obrigatório")
-    .matches(/^9\d{8}$/, "Número de telefone inválido. Deve começar com 9 e ter 9 dígitos."),
-  province_id: yup.string().required("Província é obrigatória"),
-  municipe_id: yup.string().required("Município é obrigatório"),
-  password: yup.string().required("Senha é obrigatória").min(6, "A senha deve ter no mínimo 6 caracteres"),
-});
 
 const loginSchema = yup.object().shape({
   phone_number_login: yup
@@ -195,9 +180,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
       setErrorModalVisible(true);
     }
   };
-
-
-
 
 
   if (isSuccess) {
@@ -423,8 +405,6 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
         </View>
       </View>
 
-
-      {/* Modal de sucesso */}
       {isSuccess && (
         <View style={styles.successContainer}>
           <SucessComponent
@@ -435,8 +415,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
         </View>
       )}
 
-      {/* Modal de erro */}
-      {errorModalVisible && (
+     {errorModalVisible && (
         <View style={styles.successContainer}>
           <ErrorComponent
             view={errorModalVisible}
