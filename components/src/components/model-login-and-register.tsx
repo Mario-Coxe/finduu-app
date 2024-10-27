@@ -36,11 +36,11 @@ const schema = yup.object().shape({
 });
 
 const loginSchema = yup.object().shape({
-  phone_number: yup
+  phone_number_login: yup
     .string()
     .required("Telefone é obrigatório")
     .matches(/^9\d{8}$/, "Número de telefone inválido. Deve começar com 9 e ter 9 dígitos."),
-  password: yup.string().required("Senha é obrigatória"),
+  password_login: yup.string().required("Senha é obrigatória"),
 });
 
 const registerSchema = yup.object().shape({
@@ -131,7 +131,7 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
   const handleLogin = async (data: any) => {
     try {
 
-      const loginSuccessful = await login(data.phone_number, data.password);
+      const loginSuccessful = await login(data.phone_number_login, data.password_login);
       if (loginSuccessful) {
         setloggedIn(true)
         setModalVisible(true);
@@ -237,29 +237,43 @@ const LoginRegisterModal: React.FC<LoginRegisterModalProps> = ({
                 <Text style={styles.title}>Login</Text>
                 <Controller
                   control={control}
-                  name="phone_number"
+                  name="phone_number_login"
                   render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      placeholder="Telefone"
-                      style={styles.input}
-                      keyboardType="numeric"
-                      onChangeText={onChange}
-                      value={value}
-                      maxLength={9}
-                    />
+                    <>
+                      <TextInput
+                        placeholder="Telefone"
+                        style={styles.input}
+                        keyboardType="numeric"
+                        onChangeText={onChange}
+                        value={value}
+                        maxLength={9}
+                      />
+                      {errors.phone_number_login && (
+                        <Text style={styles.errorText}>
+                          {errors.phone_number_login.message}
+                        </Text>
+                      )}
+                    </>
                   )}
                 />
                 <Controller
                   control={control}
-                  name="password"
+                  name="password_login"
                   render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      placeholder="Senha"
-                      style={styles.input}
-                      secureTextEntry={true}
-                      onChangeText={onChange}
-                      value={value}
-                    />
+                    <>
+                      <TextInput
+                        placeholder="Senha"
+                        style={styles.input}
+                        secureTextEntry={true}
+                        onChangeText={onChange}
+                        value={value}
+                      />
+                      {errors.password_login && (
+                        <Text style={styles.errorText}>
+                          {errors.password_login.message}
+                        </Text>
+                      )}
+                    </>
                   )}
                 />
                 <TouchableOpacity
