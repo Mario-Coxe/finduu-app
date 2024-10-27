@@ -16,6 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useFonts } from "expo-font";
+import Icon from "@expo/vector-icons/Ionicons";
 import { findMunicipesByProvinceId } from "../services/municipe-service";
 import { findAllProvince } from "../services/province-service";
 import { useRegisterViewModel } from "../view-models/register-and-login-view-model";
@@ -391,8 +392,18 @@ const styles = StyleSheet.create({
     fontFamily: "PoppinsBold",
   },
   errorText: {
-    color: "red",
+    color: "#D50000", 
+    marginTop: -10,
+    padding: 10,
     fontSize: 12,
+    fontFamily: "SpaceMono", 
+    backgroundColor: 'rgba(255, 235, 238, 0.2)', // Fundo sutil
+    shadowOpacity: 0.3,
+    shadowRadius: 1,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
   },
   switchText: {
     marginTop: 15,
@@ -436,25 +447,42 @@ const styles = StyleSheet.create({
 
 
 const pickerSelectStyles = {
+
   inputIOS: {
-    fontSize: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+    color: "black",
+    marginBottom: 5,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
   inputAndroid: {
-    fontSize: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+    color: "black",
+    marginBottom: 5,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
 
 };
